@@ -1,0 +1,11 @@
+[out:json][timeout:25];
+// Määrittele alue, tässä tapauksessa neliökoordinaatit:
+{{geocodeArea:Kolari}}->.searchArea;
+// Hae kaikki yritykset (amenity=*) -tägillä merkityt kohteet:
+(
+  node["amenity"](area.searchArea);
+  way["amenity"](area.searchArea);
+  relation["amenity"](area.searchArea);
+);
+// Tulosta tulokset geom -muodossa (kartan näkymä):
+out geom;
