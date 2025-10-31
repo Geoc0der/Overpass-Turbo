@@ -1,0 +1,18 @@
+/*
+This query extracts all individual shop point features (nodes)
+within the administrative boundary of the City of Turku, Finland.
+
+This is a much more specific query than the previous one,
+targeting nodes that possess the "shop" tag (e.g., shop=supermarket, shop=clothes).
+*/
+[out:json][timeout:120];
+
+// Define the area for the City of Turku, Finland.
+// The {{geocodeArea:Turku}} command finds the appropriate relation ID for the city boundary.
+{{geocodeArea:Turku}}->.turku_area;
+
+// 1. Find all nodes (point data) within the defined area that have a 'shop' tag.
+node(area.turku_area)[shop];
+
+// 2. Output the results with their geometry (for map visualization).
+out geom;
