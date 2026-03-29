@@ -3,10 +3,10 @@ import json
 
 api = overpy.Overpass()
 
-# Fix: Using "Sweden" and adding nodes/geometry to the output
+# Fix: Using "Sverige" and adding nodes/geometry to the output. Huom pitää olla maan nimi äidinkielellä
 query = """
 [out:json][timeout:120];
-area["name"="Sweden"]["admin_level"="2"]->.a;
+area["name"="Sverige"]["admin_level"="2"]->.a;
 (
   way["highway"~"^(motorway|trunk|primary)$"](area.a);
 );
