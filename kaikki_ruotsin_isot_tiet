@@ -1,24 +1,53 @@
-[out:json][timeout:90];
+import overpy
+import json
 
-// Määritellään haku koskemaan vain Tanskan aluetta (Denmark)
-{{geocodeArea:Sweden}}->.searchArea;
+api = overpy.Overpass()
 
+# Fix: Using "Sweden" and adding nodes/geometry to the output
+query = """
+[out:json][timeout:120];
+area["name"="Sweden"]["admin_level"="2"]->.a;
 (
-  // Haetaan moottoritiet ja niiden rampit Tanskan alueelta
-  way["highway"="motorway"](area.searchArea);
-  way["highway"="motorway_link"](area.searchArea);
-  
-  // Haetaan trunk-tason tiet ja niiden rampit Tanskan alueelta
-  way["highway"="trunk"](area.searchArea);
-  way["highway"="trunk_link"](area.searchArea);
-  
-   // Haetaan primary-tason tiet ja niiden rampit Tanskan alueelta
-  way["highway"="primary"](area.searchArea);
-  way["highway"="primary_link"](area.searchArea);
+  way["highway"~"^(motorway|trunk|primary)$"](area.a);
 );
-
-
-// Tulostetaan geometria
 out body;
 >;
 out skel qt;
+"""
+
+try:
+    print("Fetching Swedens main roads... (this might take 30-60 seconds)")
+    result = api.query(query)
+    
+    print(f"Success! Found {len(result.ways)} road segments.")
+
+    # Let's save the data to a GeoJSON file so you can actually USE it.
+    features = []
+    for way in result.ways:
+        # Collect coordinates for each node in the way
+        coords = [[float(node.lon), float(node.lat)] for node in way.nodes]
+        
+        if len(coords) < 2: continue # Skip invalid segments
+
+        feature = {
+            "type": "Feature",
+            "properties": way.tags,
+            "geometry": {
+                "type": "LineString",
+                "coordinates": coords
+            }
+        }
+        features.append(feature)
+
+    geojson = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
+    with open("denmark_roads.geojson", "w") as f:
+        json.dump(geojson, f)
+
+    print("Data saved to 'denmark_roads.geojson'. You can open this file in QGIS or Google Earth.")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
