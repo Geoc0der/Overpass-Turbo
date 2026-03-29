@@ -1,0 +1,24 @@
+[out:json][timeout:90];
+
+// Määritellään haku koskemaan vain Tanskan aluetta (Denmark)
+{{geocodeArea:Sweden}}->.searchArea;
+
+(
+  // Haetaan moottoritiet ja niiden rampit Tanskan alueelta
+  way["highway"="motorway"](area.searchArea);
+  way["highway"="motorway_link"](area.searchArea);
+  
+  // Haetaan trunk-tason tiet ja niiden rampit Tanskan alueelta
+  way["highway"="trunk"](area.searchArea);
+  way["highway"="trunk_link"](area.searchArea);
+  
+   // Haetaan primary-tason tiet ja niiden rampit Tanskan alueelta
+  way["highway"="primary"](area.searchArea);
+  way["highway"="primary_link"](area.searchArea);
+);
+
+
+// Tulostetaan geometria
+out body;
+>;
+out skel qt;
